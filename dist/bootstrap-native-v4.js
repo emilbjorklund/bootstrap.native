@@ -1,4 +1,4 @@
-// Native Javascript for Bootstrap 4 v2.0.26 | © dnp_theme | MIT-License
+// Native Javascript for Bootstrap 4 v2.0.27 | © dnp_theme | MIT-License
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD support:
@@ -319,7 +319,7 @@
       arrowLeft && (arrow[style][left] = arrowLeft + 'px');
     };
   
-  BSN.version = '2.0.26';
+  BSN.version = '2.0.27';
   
   /* Native Javascript for Bootstrap 4 | Alert
   -------------------------------------------*/
@@ -936,7 +936,7 @@
           isInsideMenu = menu[contains](activeItem),
           isMenuItem = activeItem[parentNode] === menu || activeItem[parentNode][parentNode] === menu;          
   
-        if ( isMenuItem || isSameElement ) { // navigate up | down
+        if ( isMenuItem ) { // navigate up | down
           idx = isSameElement ? 0 
                               : key === 38 ? (idx>1?idx-1:0)
                               : key === 40 ? (idx<menuItems[length]-1?idx+1:idx) : idx;
