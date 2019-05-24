@@ -94,6 +94,7 @@
   
     // event names
     clickEvent    = 'click',
+    focusEvent    = 'focus',
     hoverEvent    = 'hover',
     keydownEvent  = 'keydown',
     keyupEvent    = 'keyup',  
@@ -211,11 +212,13 @@
     },
   
     // event attach jQuery style / trigger  since 1.2.0
-    on = function (element, event, handler) {
-      element.addEventListener(event, handler, false);
+    on = function (element, event, handler, options) {
+      var opts = options || false;
+      element.addEventListener(event, handler, opts);
     },
-    off = function(element, event, handler) {
-      element.removeEventListener(event, handler, false);
+    off = function(element, event, handler, options) {
+      var opts = options || false;
+      element.removeEventListener(event, handler, opts);
     },
     one = function (element, event, handler) { // one since 2.0.4
       on(element, event, function handlerWrapper(e){
@@ -1056,14 +1059,28 @@
       // toggle dismissible events
       toggleDismiss = function(){
         var type = element[open] ? on : off;
-        type(DOC, clickEvent, dismissHandler); 
+        type(DOC, clickEvent, dismissHandler);
         type(DOC, keydownEvent, preventScroll);
         type(DOC, keyupEvent, keyHandler);
+  
+        // Event delegation: useCapture is (sadly, still)
+        // necessary when delegating focus events.
+        // See: https://www.quirksmode.org/blog/archives/2008/04/delegating_the.html
+        // You could probably use focusin and ditch useCapture,
+        // at the expense of (mostly?) slightly older Mozilla-based browsers
+        // (Firefox didn't add support for focusin until v55.)
+        type(DOC, focusEvent, dismissHandler, true);
       },
   
       // handlers
       dismissHandler = function(e) {
         var eventTarget = e[target], hasData = eventTarget && (stringDropdown in eventTarget || stringDropdown in eventTarget[parentNode]);
+  
+        // If this is a focus event originating from the trigger element or the menu/menu items,
+        // do not close the dropdown.
+        if ( e.type === focusEvent && (eventTarget === element || eventTarget === menu || menu[contains](eventTarget) ) ) {
+          return
+        }
         if ( (eventTarget === menu || menu[contains](eventTarget)) && (self.persist || hasData) ) { return; }
         else {
           relatedTarget = eventTarget === element || element[contains](eventTarget) ? element : null;
@@ -1124,7 +1141,9 @@
         bootstrapCustomEvent.call(parent, hiddenEvent, component, relatedTarget);
         element[open] = false;
         toggleDismiss();
-        setFocus(element);
+        if (menu[contains](document.activeElement)) {
+          setFocus(element);
+        }
         setTimeout(function(){ on(element, clickEvent, clickHandler); },1);
       };
   
