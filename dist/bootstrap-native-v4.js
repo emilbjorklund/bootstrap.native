@@ -94,6 +94,7 @@
     // event names
     clickEvent    = 'click',
     focusEvent    = 'focus',
+    focusinEvent  = 'focusin',
     hoverEvent    = 'hover',
     keydownEvent  = 'keydown',
     keyupEvent    = 'keyup',
@@ -1141,11 +1142,19 @@
           off(modal, clickEvent, dismissHandler);
         }
       },
+      focusinHandlerToggle = function() {
+        if (hasClass(modal,showClass)) {
+          on(DOC, focusinEvent, focusinHandler);
+        } else {
+          off(DOC, focusinEvent, focusinHandler);
+        }
+      },
       // triggers
       triggerShow = function() {
         resizeHandlerToggle();
         dismissHandlerToggle();
         keydownHandlerToggle();
+        focusinHandlerToggle();
         setFocus(modal);
         bootstrapCustomEvent.call(modal, shownEvent, component, relatedTarget);
       },
@@ -1163,6 +1172,7 @@
             resizeHandlerToggle();
             dismissHandlerToggle();
             keydownHandlerToggle();
+            focusinHandlerToggle();
           }
         }());
       },
@@ -1189,6 +1199,14 @@
             || (clickTarget === modal && self[backdrop] !== staticString) ) ) {
           self.hide(); relatedTarget = null;
           e[preventDefault]();
+        }
+      },
+      focusinHandler = function(e) {
+        var focusTarget = e[target];
+        if (document !== focusTarget &&
+          modal !== focusTarget &&
+          !modal.contains(focusTarget)) {
+          modal.focus();
         }
       };
   
