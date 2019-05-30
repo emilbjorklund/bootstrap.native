@@ -1154,9 +1154,9 @@
         resizeHandlerToggle();
         dismissHandlerToggle();
         keydownHandlerToggle();
-        focusinHandlerToggle();
         setFocus(modal);
         bootstrapCustomEvent.call(modal, shownEvent, component, relatedTarget);
+        focusinHandlerToggle();
       },
       triggerHide = function() {
         modal[style].display = '';
